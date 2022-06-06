@@ -8,8 +8,8 @@ The repository contains a bash script that measures Time to First Byte (TTFB) fo
 ## Getting started
 Run the commands one by one to run the script:
 ```
-git clone git@github.com:pavel-rossinsky/time-to-first-byte.git
-cd time-to-first-byte
+git clone git@github.com:pavel-rossinsky/ttfb-time-to-first-byte-cli.git
+cd ttfb-time-to-first-byte-cli
 ./ttfb.sh -f sample_urls.txt
 ```
 To see the help text:
@@ -19,7 +19,7 @@ To see the help text:
 
 ## Examples of using
 ### 1. For a single URL
-Being in the `time-to-first-byte` project root folder, run:
+Being in the `ttfb-time-to-first-byte-cli` project root folder, run:
 ```
 ./ttfb.sh -u https://github.com/
 
@@ -37,7 +37,7 @@ The output of the script has the format
 ```
 #### 2.1. Read all URLs from the file:
 ```
-time-to-first-byte % ./ttfb.sh -f sample_urls.txt
+ttfb-time-to-first-byte-cli % ./ttfb.sh -f sample_urls.txt
 
 1 200 https://github.com/ 0.112465 0.112465 0.112465
 2 200 https://stackoverflow.com/ 0.174784 0.287249 0.143624
@@ -57,7 +57,7 @@ Average TTFB:        0.213962 (s)
 
 #### 2.2. Read the URLs until the limit is reached:
 ```
-time-to-first-byte % ./ttfb.sh -f sample_urls.txt -l 4
+ttfb-time-to-first-byte-cli % ./ttfb.sh -f sample_urls.txt -l 4
 
 1 200 https://github.com/ 0.111217 0.111217 0.111217
 2 200 https://stackoverflow.com/ 0.182406 0.293623 0.146812
@@ -73,7 +73,7 @@ Average TTFB:        0.151264 (s)
 
 #### 2.3. An attempt to invalidate the cache by the timestamp to the URL:
 ```
-time-to-first-byte % ./ttfb.sh -f sample_urls.txt -i
+ttfb-time-to-first-byte-cli % ./ttfb.sh -f sample_urls.txt -i
 
 1 200 https://github.com/?1654526447 0.162112 0.162112 0.162112
 2 200 https://stackoverflow.com/?1654526447 0.199262 0.361374 0.180687
