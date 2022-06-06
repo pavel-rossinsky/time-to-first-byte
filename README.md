@@ -67,4 +67,21 @@ Total time elapsed:  0.453791 (s)
 Average TTFB:        0.151264 (s)
 ```
 
+#### 2.3. An attempt to invalidate the cache by the timestamp to the URL:
+```
+time-to-first-byte % ./ttfb.sh -f sample_urls.txt -i
 
+1 200 https://github.com/?1654526447 0.162112 0.162112 0.162112
+2 200 https://stackoverflow.com/?1654526447 0.199262 0.361374 0.180687
+3 200 https://www.amazon.de/?1654526448 0.226197 0.587571 0.195857
+4 301 https://google.de/?1654526448 -
+5 301 https://facebook.com/?1654526449 -
+6 200 https://en.zalando.de/?1654526449 0.181985 0.769556 0.192389
+7 200 https://stackoverflow.com/?1654526449 0.192427 0.961983 0.192397
+
+Pages visited:       7
+Pages evaluated:     5
+Pages skipped:       2
+Total time elapsed:  0.961983 (s)
+Average TTFB:        0.192397 (s)
+```
