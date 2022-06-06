@@ -2,16 +2,17 @@
 set -eu
 
 function help() {
-    tput setaf 2 #setaf command put a color on the command line
-    echo "Usage ./ttfb.sh -f <file> [-a] [-l] [-i] | -u <url> [-a] [-i]"
+    tput setaf 2
+    echo "Usage ./ttfb.sh -f <file> [-a] [-l] [-i] | -u <url> [-a] [-i] | -h"
 
     tput setaf 3
     echo "Options:"
-    echo -e "-u \t Single URL. Can't be used with the -f option."
+    echo -e "-u \t Single URL. Overwrites the -f option."
     echo -e "-f \t Path to the file with URLs."
     echo -e "-l \t Limit of the URLs to read from the file."
     echo -e "-a \t Overwrites the default user-agent."
     echo -e "-i \t [Flag] Invalidate cache by adding a timestamp to URL(s)."
+    echo -e "-i \t [Flag] Help."
 
     exit 0
 }
@@ -21,13 +22,14 @@ then
   help
 fi
 
-while getopts "f:u:l:a:i" opt; do
+while getopts "f:u:l:a:ih" opt; do
     case "$opt" in
     f) file=${OPTARG} ;;
     u) url=${OPTARG} ;;
     a) user_agent="${OPTARG}" ;;
     l) limit=${OPTARG} ;;
-    i) echo "test"; exit 1;;
+    i) invalidateCache=1; exit 1;;
+    h) help ;;
     *) help ;;
     esac
 done
