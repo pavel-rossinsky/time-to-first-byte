@@ -30,7 +30,7 @@ The output of the script has the format
 ```
 "{request number} {http response code} {url} {current url elapsed time} {total elapsed time} {average ttfb}"
 ```
-#### 2.1. Without the limit parameter:
+#### 2.1. Read all URLs from the file:
 ```
 time-to-first-byte % ./ttfb.sh -f sample_urls.txt
 
@@ -50,7 +50,7 @@ Average TTFB:        0.213962 (s)
 
 ```
 
-#### 2.2. With the limit parameter:
+#### 2.2. Read the URLs until the limit is reached:
 ```
 time-to-first-byte % ./ttfb.sh -f sample_urls.txt -l 4
 

@@ -5,7 +5,7 @@ while getopts "f:u:l:a:i" p; do
     case "$p" in
     f) file=${OPTARG} ;;
     u) url=${OPTARG} ;;
-    a) user_agent="user-agent: ${OPTARG}" ;;
+    a) user_agent="${OPTARG}" ;;
     l) limit=${OPTARG} ;;
     *)
         echo "usage: $0 [-f] [-u] [-l] [-a]" >&2
@@ -15,15 +15,15 @@ while getopts "f:u:l:a:i" p; do
 done
 
 if [[ -z ${user_agent+set} ]]; then
-    user_agent="user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36"
+    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36"
 fi
 
 send_request() {
-    curl -H "$2" \
+    curl -H "user-agent: $2" \
         --silent \
         -o /dev/null \
         -w "%{time_starttransfer} %{http_code}\n" \
-        "$1"
+        "$1";
 }
 
 if [[ -n ${url+set} ]]; then
