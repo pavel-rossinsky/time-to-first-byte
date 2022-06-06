@@ -3,7 +3,7 @@ set -eu
 
 function help() {
     tput setaf 2
-    echo "Usage ./ttfb.sh -f <file> [-a] [-l] [-i] | -u <url> [-a] [-i] | -h"
+    echo "Usage ./ttfb.sh -u <url> [-a] [-i] | -f <file> [-a] [-l] [-i] | -h"
 
     tput setaf 3
     echo "Options:"
@@ -11,15 +11,14 @@ function help() {
     echo -e "-f \t Path to the file with URLs."
     echo -e "-l \t Limit of the URLs to read from the file."
     echo -e "-a \t Overwrites the default user-agent."
-    echo -e "-i \t [Flag] Invalidate cache by adding a timestamp to URL(s)."
-    echo -e "-i \t [Flag] Help."
+    echo -e "-i \t [Flag] Attempt to invalidate cache by adding a timestamp to the URLs."
+    echo -e "-h \t [Flag] Help."
 
     exit 0
 }
 
-if [[ ! $* =~ ^\-.+ ]]
-then
-  help
+if [[ ! $* =~ ^\-.+ ]]; then
+    help
 fi
 
 while getopts "f:u:l:a:ih" opt; do
@@ -28,7 +27,7 @@ while getopts "f:u:l:a:ih" opt; do
     u) url=${OPTARG} ;;
     a) user_agent="${OPTARG}" ;;
     l) limit=${OPTARG} ;;
-    i) invalidateCache=1; exit 1;;
+    i) invalidate_cache=1 ;;
     h) help ;;
     *) help ;;
     esac
@@ -38,7 +37,11 @@ if [[ -z ${user_agent+set} ]]; then
     user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36"
 fi
 
-send_request() {
+if [[ -z ${invalidate_cache+set} ]]; then
+    invalidate_cache=0
+fi
+
+function send_request() {
     curl -H "user-agent: $2" \
         --silent \
         -o /dev/null \
@@ -46,7 +49,22 @@ send_request() {
         "$1"
 }
 
+function prepare_url() {
+    url=$1
+
+    if [[ $2 -gt 0 ]]; then
+        if [[ "$url" == *"?"* ]]; then
+            url="$url&$(date +%s)"
+        else
+            url="$url?$(date +%s)"
+        fi
+    fi
+
+    echo "$url"
+}
+
 if [[ -n ${url+set} ]]; then
+    url="$(prepare_url "$url" $invalidate_cache)"
     read -r curr_time http_code <<<"$(send_request "$url" "$user_agent")"
     echo "$http_code" "$url" "$curr_time"
 
@@ -68,6 +86,8 @@ non_200_counter=0
 printf "\n"
 while read -r in || [ -n "$in" ]; do
     counter=$((counter + 1))
+
+    in="$(prepare_url "$in" $invalidate_cache)"
 
     read -r curr_time http_code <<<"$(send_request "$in" "$user_agent")"
     if [[ $http_code != '200' ]]; then
