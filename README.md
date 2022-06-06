@@ -26,6 +26,11 @@ The output of the script has the format
 ```
 
 ### For a file containing URLs
+The output of the script has the format
+```
+"{request number} {http response code} {url} {current url elapsed time} {total elapsed time} {average ttfb}"
+```
+#### Without the limit parameter:
 ```
 time-to-first-byte % ./ttfb.sh -f sample_urls.txt
 
@@ -44,11 +49,21 @@ Total time elapsed:  1.06981 (s)
 Average TTFB:        0.213962 (s)
 
 ```
-The output of the script has the format
+#### With the limit parameter:
 ```
-"{request number} {http response code} {url} {current url elapsed time} {total elapsed time} {current average ttfb}"
-```
+time-to-first-byte % ./ttfb.sh -f sample_urls.txt -l 4
 
+1 200 https://github.com/ 0.111217 0.111217 0.111217
+2 200 https://stackoverflow.com/ 0.182406 0.293623 0.146812
+3 200 https://www.amazon.de/ 0.160168 0.453791 0.151264
+4 301 https://google.de/ -
+
+Pages visited:       4
+Pages evaluated:     3
+Pages skipped:       1
+Total time elapsed:  0.453791 (s)
+Average TTFB:        0.151264 (s)
+```
 
 You can overwrite the default user-agent
 

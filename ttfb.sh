@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-while getopts "f:u:l:a:" p; do
+while getopts "f:u:l:a:i" p; do
     case "$p" in
     f) file=${OPTARG} ;;
     u) url=${OPTARG} ;;
@@ -45,6 +45,7 @@ fi
 total_time=0
 counter=0
 non_200_counter=0
+printf "\n"
 while read -r in || [ -n "$in" ]; do
     counter=$((counter + 1))
 
@@ -52,12 +53,11 @@ while read -r in || [ -n "$in" ]; do
     if [[ $http_code != '200' ]]; then
         non_200_counter=$((non_200_counter + 1))
         echo $counter "$http_code" "$in" -
-        continue
+    else
+        total_time=$(awk "BEGIN {print $total_time+$curr_time; exit}")
+        average=$(awk "BEGIN {print $total_time/($counter-$non_200_counter); exit}")
+        echo $counter "$http_code" "$in" "$curr_time" "$total_time" "$average"
     fi
-
-    total_time=$(awk "BEGIN {print $total_time+$curr_time; exit}")
-    average=$(awk "BEGIN {print $total_time/($counter-$non_200_counter); exit}")
-    echo $counter "$http_code" "$in" "$curr_time" "$total_time" "$average"
 
     if [[ $limit -gt 0 && $counter -ge $limit ]]; then
         break
