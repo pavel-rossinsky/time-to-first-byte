@@ -64,8 +64,9 @@ while read -r in || [ -n "$in" ]; do
     fi
 done <"$file"
 
-echo "Pages visited:   $((counter))"
-echo "Pages evaluated: $((counter - non_200_counter))"
-echo "Pages skipped:   $non_200_counter"
-echo "Time elapsed:    $total_time (s)"
-echo "Average TTFB:    $(awk "BEGIN {print $total_time/($counter-$non_200_counter); exit}") (s)"
+printf "\n"
+echo "Pages visited:       $((counter))"
+echo "Pages evaluated:     $((counter - non_200_counter))"
+echo "Pages skipped:       $non_200_counter"
+echo "Total time elapsed:  $total_time (s)"
+echo "Average TTFB:        $(awk "BEGIN {print $total_time/($counter-$non_200_counter); exit}") (s)"
