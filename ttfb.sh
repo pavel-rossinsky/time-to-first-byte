@@ -1,16 +1,34 @@
 #!/bin/bash
 set -eu
 
-while getopts "f:u:l:a:i" p; do
-    case "$p" in
+function help() {
+    tput setaf 2 #setaf command put a color on the command line
+    echo "Usage ./ttfb.sh -f <file> [-a] [-l] [-i] | -u <url> [-a] [-i]"
+
+    tput setaf 3
+    echo "Options:"
+    echo -e "-u \t Single URL. Can't be used with the -f option."
+    echo -e "-f \t Path to the file with URLs."
+    echo -e "-l \t Limit of the URLs to read from the file."
+    echo -e "-a \t Overwrites the default user-agent."
+    echo -e "-i \t [Flag] Invalidate cache by adding a timestamp to URL(s)."
+
+    exit 0
+}
+
+if [[ ! $* =~ ^\-.+ ]]
+then
+  help
+fi
+
+while getopts "f:u:l:a:i" opt; do
+    case "$opt" in
     f) file=${OPTARG} ;;
     u) url=${OPTARG} ;;
     a) user_agent="${OPTARG}" ;;
     l) limit=${OPTARG} ;;
-    *)
-        echo "usage: $0 [-f] [-u] [-l] [-a]" >&2
-        exit 1
-        ;;
+    i) echo "test"; exit 1;;
+    *) help ;;
     esac
 done
 
@@ -23,7 +41,7 @@ send_request() {
         --silent \
         -o /dev/null \
         -w "%{time_starttransfer} %{http_code}\n" \
-        "$1";
+        "$1"
 }
 
 if [[ -n ${url+set} ]]; then
