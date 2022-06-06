@@ -8,8 +8,8 @@ The repository contains a bash script that measures Time to First Byte (TTFB) fo
 ## Getting started
 Run the commands one by one to run the script:
 ```
-git clone git@github.com:pavel-rossinsky/ttfb.git
-cd ttfb
+git clone git@github.com:pavel-rossinsky/time-to-first-byte.git
+cd time-to-first-byte
 ./ttfb.sh -f sample_urls.txt
 ```
 To see the help text:
@@ -19,7 +19,7 @@ To see the help text:
 
 ## Examples of using
 ### 1. For a single URL
-Being in the `ttfb` project root folder, run:
+Being in the `time-to-first-byte` project root folder, run:
 ```
 ./ttfb.sh -u https://github.com/
 
