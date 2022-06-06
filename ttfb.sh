@@ -45,7 +45,7 @@ fi
 total_time=0
 counter=0
 non_200_counter=0
-while read -r in; do
+while read -r in || [ -n "$in" ]; do
     counter=$((counter + 1))
 
     read -r curr_time http_code <<<"$(send_request "$in" "$user_agent")"
