@@ -1,14 +1,39 @@
 #!/bin/bash
 set -eu
 
-# Shows time in seconds to first byte of a url or urls
-# Run it by supplying the path to the file containing URLs: /ttfb_runner.sh ../../test_urls.txt
-# or like this ./bin/dev/ttfb_runner.sh test_urls.txt from the project root.
-# You can limit the number of pages that will be visited by the script by adding a numeric value as the second parameter:
-# ./bin/dev/ttfb_runner.sh test_urls.txt 10 - the script will visit not more than 10 URLs.
+while getopts "f:u:l:a:" p; do
+    case "$p" in
+    f) file=${OPTARG} ;;
+    u) url=${OPTARG} ;;
+    a) user_agent=${OPTARG} ;;
+    *)
+        echo "usage: $0 [-f] [-u] [-l] [-a]" >&2
+        exit 1
+        ;;
+    esac
+done
 
-if [[ ! -f $1 ]]; then
-    echo "File '$1' not found"
+if [[ -z ${agent+set} ]]; then
+    user_agent="user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36"
+fi
+
+send_request() {
+    curl -H "$2" \
+        --silent \
+        -o /dev/null \
+        -w "%{time_starttransfer} %{http_code}\n" \
+        "$1"
+}
+
+if [[ -n ${url+set} ]]; then
+    read -r curr_time http_code <<<"$(send_request "$url" "$user_agent")"
+    echo "$http_code" "$url" "$curr_time"
+
+    exit 0
+fi
+
+if [[ ! -f $file ]]; then
+    echo "File '$file' not found"
     exit 1
 fi
 
@@ -21,11 +46,11 @@ total_time=0
 counter=0
 non_200_counter=0
 while read -r in; do
-    counter=$((counter+1))
+    counter=$((counter + 1))
 
-    read -r curr_time http_code <<< "$(curl --silent -o /dev/null -w "%{time_starttransfer} %{http_code}\n" "$in")"
+    read -r curr_time http_code <<<"$(send_request "$in" "$user_agent")"
     if [[ $http_code != '200' ]]; then
-        non_200_counter=$((non_200_counter+1))
+        non_200_counter=$((non_200_counter + 1))
         echo $counter "$http_code" "$in" -
         continue
     fi
@@ -37,7 +62,7 @@ while read -r in; do
     if [[ $limit -gt 0 && $counter -ge $limit ]]; then
         break
     fi
-done < "$1"
+done <"$file"
 
 echo "Pages visited:   $((counter))"
 echo "Pages evaluated: $((counter - non_200_counter))"
