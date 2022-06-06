@@ -13,7 +13,7 @@ cd time-to-first-byte
 ```
 
 ## Examples of using
-### For a single URL
+### 1. For a single URL
 Being in the `time-to-first-byte` project root folder, run:
 ```
 ./ttfb.sh -u https://github.com/
@@ -25,12 +25,12 @@ The output of the script has the format
 "{http response code} {url} {elapsed time}"
 ```
 
-### For a file containing URLs
+### 2. For a file containing URLs
 The output of the script has the format
 ```
 "{request number} {http response code} {url} {current url elapsed time} {total elapsed time} {average ttfb}"
 ```
-#### Without the limit parameter:
+#### 2.1. Without the limit parameter:
 ```
 time-to-first-byte % ./ttfb.sh -f sample_urls.txt
 
@@ -49,7 +49,8 @@ Total time elapsed:  1.06981 (s)
 Average TTFB:        0.213962 (s)
 
 ```
-#### With the limit parameter:
+
+#### 2.2. With the limit parameter:
 ```
 time-to-first-byte % ./ttfb.sh -f sample_urls.txt -l 4
 
@@ -65,5 +66,4 @@ Total time elapsed:  0.453791 (s)
 Average TTFB:        0.151264 (s)
 ```
 
-You can overwrite the default user-agent
 
