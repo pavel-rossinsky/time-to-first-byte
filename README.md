@@ -15,6 +15,11 @@ cd time-to-first-byte
 ## How to run the script
 ### Option 1
 Being in the `time-to-first-byte` project root folder, run:
-```ini
-./ttfb.sh {path_to_the_text_file_containing_urls}
 ```
+./ttfb.sh -u https://github.com/
+```
+The script output has the format ``"{http response code} {url} {elapsed time}"``:
+```
+200 https://github.com/ 0.129872
+```
+
