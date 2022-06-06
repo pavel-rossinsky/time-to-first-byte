@@ -6,11 +6,15 @@ The repository contains a bash script that measures Time to First Byte (TTFB) fo
 - Docker (optionally)
 
 ## Getting started
-Run the commands one by one:
+Run the commands one by one to run the script:
 ```
 git clone git@github.com:pavel-rossinsky/time-to-first-byte.git
 cd time-to-first-byte
 ./ttfb.sh -f sample_urls.txt
+```
+To see the help text:
+```
+./ttfb.sh -h
 ```
 
 ## Examples of using
