@@ -13,6 +13,7 @@ cd time-to-first-byte
 ```
 
 ## How to run the script
+### Option 1
 Being in the `time-to-first-byte` project root folder, run:
 ```ini
 ./ttfb.sh {path_to_the_text_file_containing_urls}
