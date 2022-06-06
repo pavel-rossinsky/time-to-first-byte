@@ -10,6 +10,7 @@ Run the commands one by one:
 ```
 git clone git@github.com:pavel-rossinsky/time-to-first-byte.git
 cd time-to-first-byte
+./ttfb.sh -f sample_urls.txt
 ```
 
 ## Examples of using
