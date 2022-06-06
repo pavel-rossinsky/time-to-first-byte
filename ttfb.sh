@@ -5,7 +5,8 @@ while getopts "f:u:l:a:" p; do
     case "$p" in
     f) file=${OPTARG} ;;
     u) url=${OPTARG} ;;
-    a) user_agent=${OPTARG} ;;
+    a) user_agent="user-agent: ${OPTARG}" ;;
+    l) limit=${OPTARG} ;;
     *)
         echo "usage: $0 [-f] [-u] [-l] [-a]" >&2
         exit 1
@@ -13,7 +14,7 @@ while getopts "f:u:l:a:" p; do
     esac
 done
 
-if [[ -z ${agent+set} ]]; then
+if [[ -z ${user_agent+set} ]]; then
     user_agent="user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36"
 fi
 
@@ -32,14 +33,13 @@ if [[ -n ${url+set} ]]; then
     exit 0
 fi
 
+if [[ -z ${limit+set} ]]; then
+    limit=0
+fi
+
 if [[ ! -f $file ]]; then
     echo "File '$file' not found"
     exit 1
-fi
-
-limit=0
-if [[ -n ${2+set} ]]; then
-    limit=$2
 fi
 
 total_time=0
