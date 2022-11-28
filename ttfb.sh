@@ -3,7 +3,7 @@ set -eu
 
 function help() {
     tput setaf 2
-    echo "Usage ./ttfb.sh -u <url> [-a] [-i] | -f <file> [-a] [-l] [-i] | -h"
+    echo "Usage ./ttfb.sh -f <file> [-a] [-l] [-i] | -h"
 
     tput setaf 3
     echo "Options:"
@@ -25,7 +25,6 @@ fi
 while getopts "f:u:l:a::rih" opt; do
     case "$opt" in
     f) file=${OPTARG} ;;
-    u) url=${OPTARG} ;;
     a) user_agent="${OPTARG}" ;;
     l) limit=${OPTARG} ;;
     i) invalidate_cache=1 ;;
@@ -51,7 +50,7 @@ function send_request() {
     curl -H "user-agent: $2" \
         --silent \
         -o /dev/null \
-        -w "%{time_starttransfer} %{http_code}\n" \
+        -w "%{time_starttransfer} %{http_code} %{time_pretransfer} %{time_connect} %{time_namelookup}\n" \
         "$1"
 }
 
@@ -69,14 +68,6 @@ function prepare_url() {
     echo "$url"
 }
 
-if [[ -n ${url+set} ]]; then
-    url="$(prepare_url "$url" $invalidate_cache)"
-    read -r curr_time http_code <<<"$(send_request "$url" "$user_agent")"
-    echo "$http_code" "$url" "$curr_time"
-
-    exit 0
-fi
-
 if [[ -z ${limit+set} ]]; then
     limit=0
 fi
@@ -86,9 +77,11 @@ if [[ ! -f $file ]]; then
     exit 1
 fi
 
-total_time=0
+time_total=0
+server_time_total=0
 visited_counter=0
 non_200_counter=0
+latency_time_total=0
 
 printf "\n"
 
@@ -97,14 +90,18 @@ function visit_url() {
 
     url="$(prepare_url "$1" $invalidate_cache)"
 
-    read -r curr_time http_code <<<"$(send_request "$url" "$user_agent")"
+    read -r time_starttransfer http_code time_pretransfer time_connect time_namelookup <<<"$(send_request "$url" "$user_agent")"
     if [[ $http_code != '200' ]]; then
         non_200_counter=$((non_200_counter + 1))
         echo "$visited_counter" "$http_code" "$url" -
     else
-        total_time=$(awk "BEGIN {print $total_time+$curr_time; exit}")
-        average=$(awk "BEGIN {print $total_time/($visited_counter-$non_200_counter); exit}")
-        echo "$visited_counter" "$http_code" "$url" "$curr_time" "$total_time" "$average"
+        server_time=$(awk "BEGIN {print $time_starttransfer-$time_pretransfer; exit}")
+        server_time_total=$(awk "BEGIN {print $server_time_total+$server_time; exit}")
+        latency_time=$(awk "BEGIN {print $time_connect-$time_namelookup; exit}")
+        latency_time_total=$(awk "BEGIN {print $latency_time_total+$latency_time; exit}")
+        time_total=$(awk "BEGIN {print $time_total+$time_starttransfer; exit}")
+        server_time_average=$(awk "BEGIN {print $server_time_total/($visited_counter-$non_200_counter); exit}")
+        echo "$visited_counter" "$http_code" "$url" "$time_starttransfer" "$server_time" "$server_time_average"
     fi
 }
 
@@ -131,6 +128,8 @@ if [[ $random == 1 ]]; then
     done
 else
     while read -r in || [ -n "$in" ]; do
+        [ -z "$in" ] && continue
+        
         visit_url "$in"
 
         if [[ $limit -gt 0 && $visited_counter -ge $limit ]]; then
@@ -140,8 +139,16 @@ else
 fi
 
 printf "\n"
-echo "Pages visited:       $((visited_counter))"
-echo "Pages evaluated:     $((visited_counter - non_200_counter))"
-echo "Pages skipped:       $non_200_counter"
-echo "Total time elapsed:  $total_time (s)"
-echo "Average TTFB:        $(awk "BEGIN {print $total_time/($visited_counter-$non_200_counter); exit}") (s)"
+
+pages_evaluated=$(awk "BEGIN {print $visited_counter-$non_200_counter; exit}")
+latency_time_average=$(awk "BEGIN {print $latency_time_total/$pages_evaluated; exit}")
+server_time_average=$(awk "BEGIN {print $server_time_total/$pages_evaluated; exit}")
+
+echo "Pages visited:                  $((visited_counter))"
+echo "Pages evaluated:                $((visited_counter - non_200_counter))"
+echo "Pages skipped:                  $non_200_counter"
+echo "Total time elapsed:             $time_total s"
+echo "Avg TTFB:                       $(awk "BEGIN {print ($time_total/$pages_evaluated) * 1000; exit}") ms"
+echo "Avg server time with latency:   $(awk "BEGIN {print $server_time_average * 1000; exit}") ms"
+echo "Avg network latency:            $(awk "BEGIN {print $latency_time_average * 1000; exit}") ms"
+echo "Avg server time minus latency:  $(awk "BEGIN {print ($server_time_average - $latency_time_average*2) * 1000; exit}") ms"
