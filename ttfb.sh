@@ -39,7 +39,7 @@ if [[ ! -f $file ]]; then
 fi
 
 if [[ -z ${limit+set} ]]; then
-    limit=0
+    limit=$(wc -l < "$file")
 else
     lines_in_file=$(wc -l < "$file")
     if [[ $limit -gt $lines_in_file ]]; then
@@ -158,7 +158,8 @@ if [[ $pages_evaluated -gt 0 ]]; then
     printf "Avg TTFB:                            %.2f ms\n" "$(awk "BEGIN {print ($time_total/$pages_evaluated) * 1000; exit}")"
     printf "Avg server time with latency:        %.2f ms\n" "$(awk "BEGIN {print $server_time_average * 1000; exit}")"
     printf "Avg network latency:                 %.2f ms\n" "$(awk "BEGIN {print $latency_time_average * 1000; exit}")"
-    printf "Avg server time minus latency:       %.2f ms\n" "$(awk "BEGIN {print ($server_time_average - $latency_time_average*2) * 1000; exit}")"
+    printf "Avg server time minus latency:       %.2f ms\n" "$(awk "BEGIN {print ($server_time_average - $latency_time_average) * 1000; exit}")"
+    printf "Avg server time minus latency*2:     %.2f ms\n" "$(awk "BEGIN {print ($server_time_average - $latency_time_average*2) * 1000; exit}")"
 fi
 
 printf "\n"
