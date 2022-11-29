@@ -92,7 +92,7 @@ printf "\n"
 
 function evaluate_url() {
     [ $visited_counter -eq 0 ] &&
-    printf '"%s" "%s" "%s" "%s" "%s" "%s"\n' "Counter" "HTTP Code" "URL" "TTFB (ms)" "Server Time minus Latency (ms)" "Latency (ms)"
+    printf '"%s" "%s" "%s" "%s" "%s" "%s"\n\n' "Counter" "HTTP Code" "URL" "TTFB (ms)" "Server Time minus Latency (ms)" "Latency (ms)"
     
     ((visited_counter+=1))
 
