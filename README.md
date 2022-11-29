@@ -15,24 +15,7 @@ curl -w \
 -o /dev/null -s "https://www.google.com"
 ```
 
-## Technical prerequisites
-- Unix-based OS
-- Git
-- Docker (optionally)
-
-## Getting started
-Run the commands one by one to run the script:
-```
-git clone git@github.com:pavel-rossinsky/time-to-first-byte.git
-cd time-to-first-byte
-./ttfb.sh -f sample_urls.txt
-```
-To see the help text:
-```
-./ttfb.sh -h
-```
-
-#### Read all URLs from the file:
+## Sample output
 ```
 time-to-first-byte % ./ttfb.sh -f sample_urls.txt -r
 
@@ -54,4 +37,21 @@ Avg server time with latency:        96.12 ms
 Avg network latency:                 23.21 ms
 Avg server time minus latency:       72.91 ms
 Avg server time minus latency*2:     49.70 ms
+```
+
+## Technical prerequisites
+- curl
+- Git
+- Docker (optionally)
+
+## Getting started
+Run the commands one by one to run the script:
+```
+git clone git@github.com:pavel-rossinsky/time-to-first-byte.git
+cd time-to-first-byte
+./ttfb.sh -f sample_urls.txt
+```
+To see the help text:
+```
+./ttfb.sh -h
 ```
