@@ -9,7 +9,7 @@ function help() {
     echo "Options:"
     echo -e "-f \t Path to a file with URLs."
     echo -e "-a \t Overwrites the default user-agent."
-    echo -e "-l \t Limit number of URLs to read from the file."
+    echo -e "-l \t Limit the number of URLs to read from a file."
     echo -e "-q \t Query string to be added to each URL."
     echo -e "-i \t [Flag] Attempt to invalidate cache by adding a timestamp to the URLs."
     echo -e "-r \t [Flag] Reads URLs from a file in random order."
