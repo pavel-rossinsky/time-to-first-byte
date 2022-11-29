@@ -90,7 +90,10 @@ non_200_counter=0
 
 printf "\n"
 
-function visit_url() {
+function evaluate_url() {
+    [ $visited_counter -eq 0 ] &&
+    printf '"%s" "%s" "%s" "%s" "%s" "%s"\n' "Counter" "HTTP Code" "URL" "TTFB" "Server Time minus Latency" "Latency"
+    
     ((visited_counter+=1))
 
     url="$(prepare_url "$1" $invalidate_cache)"
@@ -106,7 +109,12 @@ function visit_url() {
         latency_time_total=$(awk "BEGIN {print $latency_time_total+$latency_time; exit}")
         time_total=$(awk "BEGIN {print $time_total+$time_starttransfer; exit}")
         server_time_average=$(awk "BEGIN {print $server_time_total/($visited_counter-$non_200_counter); exit}")
-        echo "$visited_counter" "$http_code" "$url" "$time_starttransfer" "$server_time" "$server_time_average"
+        
+        latency_time_ms="$(awk "BEGIN {print $latency_time * 1000; exit}")"
+        time_starttransfer_ms="$(awk "BEGIN {print $time_starttransfer * 1000; exit}")"
+        server_time_no_latency_ms=$(awk "BEGIN {print ($server_time-$latency_time) * 1000; exit}")
+        
+        printf "%d %d %s %.2f %.2f %.2f\n" "$visited_counter" "$http_code" "$url" "$time_starttransfer_ms" "$server_time_no_latency_ms" "$latency_time_ms"
     fi
 }
 
@@ -130,13 +138,13 @@ if [[ $random == 1 ]]; then
     for row in "${random_rows[@]}"
     do
         in=$(awk "NR==$row{ print; exit }" "$file")
-        visit_url "$in"
+        evaluate_url "$in"
     done
 else
     while read -r in || [ -n "$in" ]; do
         [ -z "$in" ] && continue
         
-        visit_url "$in"
+        evaluate_url "$in"
 
         if [[ $limit -gt 0 && $visited_counter -ge $limit ]]; then
             break
