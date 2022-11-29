@@ -3,15 +3,16 @@ set -eu
 
 function help() {
     tput setaf 2
-    echo "Usage ./ttfb.sh -f <file> [-a] [-l] [-i] [-r] | -h"
+    echo "Usage ./ttfb.sh -f <file> [-a <agent>] [-q <query>] [-l <limit>] [-ir] | -h"
 
     tput setaf 3
     echo "Options:"
-    echo -e "-f \t Path to the file with URLs."
+    echo -e "-f \t Path to a file with URLs."
     echo -e "-a \t Overwrites the default user-agent."
     echo -e "-l \t Limit number of URLs to read from the file."
+    echo -e "-q \t Query string to be added to each URL."
     echo -e "-i \t [Flag] Attempt to invalidate cache by adding a timestamp to the URLs."
-    echo -e "-r \t [Flag] Reads random rows from the file."
+    echo -e "-r \t [Flag] Reads URLs from a file in random order."
     echo -e "-h \t [Flag] Help."
 
     exit 0
@@ -21,11 +22,12 @@ if [[ ! $* =~ ^\-.+ ]]; then
     help
 fi
 
-while getopts "f:l:a::rih" opt; do
+while getopts "f:l:q:a::rih" opt; do
     case "$opt" in
     f) file=${OPTARG} ;;
     a) user_agent="${OPTARG}" ;;
     l) limit=${OPTARG} ;;
+    q) query=${OPTARG} ;;
     i) invalidate_cache=1 ;;
     r) random=1 ;;
     h) help ;;
@@ -38,6 +40,10 @@ if [[ ! -f $file ]]; then
     exit 1
 fi
 
+if [[ -z ${user_agent+set} ]]; then
+    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36"
+fi
+
 if [[ -z ${limit+set} ]]; then
     limit=$(wc -l < "$file")
 else
@@ -48,8 +54,8 @@ else
     fi
 fi
 
-if [[ -z ${user_agent+set} ]]; then
-    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36"
+if [[ -z ${query+set} ]]; then
+    query=''
 fi
 
 if [[ -z ${invalidate_cache+set} ]]; then
@@ -70,13 +76,23 @@ function send_request() {
 
 function prepare_url() {
     url=$1
-
+    
+    appendix=()
     if [[ $2 -gt 0 ]]; then
-        if [[ "$url" == *"?"* ]]; then
-            url="$url&$(date +%s)"
-        else
-            url="$url?$(date +%s)"
-        fi
+        appendix+=("timestamp=$(date +%s)")
+    fi
+    
+    if [[ -n "$3" ]]; then
+        appendix+=("$3")
+    fi
+    
+    if [[ ${#appendix[@]} -gt 0 ]]; then
+        connector=$([[ "$url" == *"?"* ]] && echo '&' || echo '?')
+        for p in "${appendix[@]}"
+        do
+            url="${url}${connector}${p}"
+            connector='&'
+        done
     fi
 
     echo "$url"
@@ -96,7 +112,7 @@ function evaluate_url() {
     
     ((visited_counter+=1))
 
-    url="$(prepare_url "$1" $invalidate_cache)"
+    url="$(prepare_url "$1" $invalidate_cache "$query")"
 
     read -r time_starttransfer http_code time_pretransfer time_connect time_namelookup <<<"$(send_request "$url" "$user_agent")"
     if [[ $http_code != '200' ]]; then
