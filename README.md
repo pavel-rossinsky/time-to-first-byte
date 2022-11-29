@@ -1,4 +1,4 @@
-The repository contains a bash script that measures Time to First Byte (TTFB) for a single URL or a list of URLs stored in a text file using `curl`. Excludes failed requests and redirects.
+The repository contains a bash script that measures Time to First Byte (TTFB), Server Time, and Network Latency for a list of URLs stored in a text file using `curl`. Excludes failed requests and redirects.
 
 ## Technical prerequisites
 - Unix-based OS
