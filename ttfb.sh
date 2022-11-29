@@ -43,7 +43,7 @@ if [[ -z ${limit+set} ]]; then
 else
     lines_in_file=$(wc -l < "$file")
     if [[ $limit -gt $lines_in_file ]]; then
-        printf "Set the limit to %d instead of %d \n" "$lines_in_file" "$limit"
+        printf "The limit is set to its max %d instead of %d \n" "$lines_in_file" "$limit"
         limit=$lines_in_file
     fi
 fi
@@ -148,17 +148,17 @@ printf "\n"
 
 pages_evaluated=$(awk "BEGIN {print $visited_counter-$non_200_counter; exit}")
 
-echo "Pages visited:                  $((visited_counter))"
-echo "Pages evaluated:                $((visited_counter - non_200_counter))"
-echo "Pages skipped:                  $non_200_counter"
-echo "Total time elapsed:             $time_total s"
+printf "Pages visited / evaluated / skipped:   %d / %d / %d\n\n" "$visited_counter" "$((visited_counter - non_200_counter))" "$non_200_counter"
+printf "Total time elapsed:                  %.2f s\n" "$time_total"
 
 if [[ $pages_evaluated -gt 0 ]]; then
     latency_time_average=$(awk "BEGIN {print $latency_time_total/$pages_evaluated; exit}")
     server_time_average=$(awk "BEGIN {print $server_time_total/$pages_evaluated; exit}")
     
-    echo "Avg TTFB:                       $(awk "BEGIN {print ($time_total/$pages_evaluated) * 1000; exit}") ms"
-    echo "Avg server time with latency:   $(awk "BEGIN {print $server_time_average * 1000; exit}") ms"
-    echo "Avg network latency:            $(awk "BEGIN {print $latency_time_average * 1000; exit}") ms"
-    echo "Avg server time minus latency:  $(awk "BEGIN {print ($server_time_average - $latency_time_average*2) * 1000; exit}") ms"
+    printf "Avg TTFB:                            %.2f ms\n" "$(awk "BEGIN {print ($time_total/$pages_evaluated) * 1000; exit}")"
+    printf "Avg server time with latency:        %.2f ms\n" "$(awk "BEGIN {print $server_time_average * 1000; exit}")"
+    printf "Avg network latency:                 %.2f ms\n" "$(awk "BEGIN {print $latency_time_average * 1000; exit}")"
+    printf "Avg server time minus latency:       %.2f ms\n" "$(awk "BEGIN {print ($server_time_average - $latency_time_average*2) * 1000; exit}")"
 fi
+
+printf "\n"
