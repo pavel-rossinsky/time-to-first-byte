@@ -43,7 +43,7 @@ if [[ -z ${limit+set} ]]; then
 else
     lines_in_file=$(wc -l < "$file")
     if [[ $limit -gt $lines_in_file ]]; then
-        printf "Set the limit to %d instead of %d" "$lines_in_file" "$limit"
+        printf "Set the limit to %d instead of %d \n" "$lines_in_file" "$limit"
         limit=$lines_in_file
     fi
 fi
