@@ -1,7 +1,7 @@
 The repository contains a bash script that measures Time to First Byte (TTFB), Server Time, and Network Latency for a list of URLs stored in a text file using `curl`. Excludes failed requests and redirects.
 
 The ttfb.sh script uses curl for measuring the time.
-An article to read explaining the concept https://blog.cloudflare.com/a-question-of-timing/
+An article to read explaining the concept is https://blog.cloudflare.com/a-question-of-timing/
 
 
 ```
