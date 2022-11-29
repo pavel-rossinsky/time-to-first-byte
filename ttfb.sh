@@ -106,8 +106,11 @@ function visit_url() {
 
 if [[ $random == 1 ]]; then
     random_rows=()
+
+    [ $limit -eq 0 ] && limit=$(wc -l < "$file")
+    
     while IFS= read -r row ; do random_rows+=("$row"); done <<< "$(
-    awk -v loop=$limit -v range="$(wc -l "$file")" 'BEGIN {
+        awk -v loop="$limit" -v range="$(wc -l < "$file")" 'BEGIN {
             srand()
             do {
                 numb = 1 + int(rand() * range)
