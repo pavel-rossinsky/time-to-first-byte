@@ -4,15 +4,15 @@ The ttfb.sh script uses curl for measuring the time.
 An article to read explaining the concept is https://blog.cloudflare.com/a-question-of-timing/
 
 
-#### Try it by running
+#### Try it by running command in terminal
 ```
 curl -w \
-    "time_namelookup: %{time_namelookup}, \
-     time_connect: %{time_connect}, \
-     time_appconnect: %{time_appconnect}, \
-     time_redirect: %{time_redirect}, \
-     time_pretransfer: %{time_pretransfer}, \
-     time_starttransfer: %{time_starttransfer}\n" \
+" time_namelookup: %{time_namelookup}\n \
+time_connect: %{time_connect}\n \
+time_appconnect: %{time_appconnect}\n \
+time_redirect: %{time_redirect}\n \
+time_pretransfer: %{time_pretransfer}\n \
+time_starttransfer: %{time_starttransfer}\n" \
 -o /dev/null -s "https://www.google.com"
 ```
 
