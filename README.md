@@ -4,6 +4,7 @@ The ttfb.sh script uses curl for measuring the time.
 An article to read explaining the concept is https://blog.cloudflare.com/a-question-of-timing/
 
 
+#### Try it by running
 ```
 curl -w \
     "time_namelookup: %{time_namelookup}, \
