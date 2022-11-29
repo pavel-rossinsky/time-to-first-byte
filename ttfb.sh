@@ -3,16 +3,15 @@ set -eu
 
 function help() {
     tput setaf 2
-    echo "Usage ./ttfb.sh -f <file> [-a] [-l] [-i] | -h"
+    echo "Usage ./ttfb.sh -f <file> [-a] [-l] [-i] [-r] | -h"
 
     tput setaf 3
     echo "Options:"
-    echo -e "-u \t Single URL. Overwrites the -f option."
     echo -e "-f \t Path to the file with URLs."
-    echo -e "-l \t Limit of the URLs to read from the file."
-    echo -e "-r \t Reads random rows from the file."
     echo -e "-a \t Overwrites the default user-agent."
+    echo -e "-l \t Limit number of URLs to read from the file."
     echo -e "-i \t [Flag] Attempt to invalidate cache by adding a timestamp to the URLs."
+    echo -e "-r \t [Flag] Reads random rows from the file."
     echo -e "-h \t [Flag] Help."
 
     exit 0
@@ -22,7 +21,7 @@ if [[ ! $* =~ ^\-.+ ]]; then
     help
 fi
 
-while getopts "f:u:l:a::rih" opt; do
+while getopts "f:l:a::rih" opt; do
     case "$opt" in
     f) file=${OPTARG} ;;
     a) user_agent="${OPTARG}" ;;
@@ -79,9 +78,9 @@ fi
 
 time_total=0
 server_time_total=0
+latency_time_total=0
 visited_counter=0
 non_200_counter=0
-latency_time_total=0
 
 printf "\n"
 
