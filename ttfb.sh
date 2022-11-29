@@ -33,6 +33,21 @@ while getopts "f:l:a::rih" opt; do
     esac
 done
 
+if [[ ! -f $file ]]; then
+    echo "File '$file' not found"
+    exit 1
+fi
+
+if [[ -z ${limit+set} ]]; then
+    limit=0
+else
+    lines_in_file=$(wc -l < "$file")
+    if [[ $limit -gt $lines_in_file ]]; then
+        printf "Set the limit to %d instead of %d" "$lines_in_file" "$limit"
+        limit=$lines_in_file
+    fi
+fi
+
 if [[ -z ${user_agent+set} ]]; then
     user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36"
 fi
@@ -67,15 +82,6 @@ function prepare_url() {
     echo "$url"
 }
 
-if [[ -z ${limit+set} ]]; then
-    limit=0
-fi
-
-if [[ ! -f $file ]]; then
-    echo "File '$file' not found"
-    exit 1
-fi
-
 time_total=0
 server_time_total=0
 latency_time_total=0
@@ -107,8 +113,6 @@ function visit_url() {
 if [[ $random == 1 ]]; then
     random_rows=()
 
-    [ $limit -eq 0 ] && limit=$(wc -l < "$file")
-    
     while IFS= read -r row ; do random_rows+=("$row"); done <<< "$(
         awk -v loop="$limit" -v range="$(wc -l < "$file")" 'BEGIN {
             srand()
@@ -143,14 +147,18 @@ fi
 printf "\n"
 
 pages_evaluated=$(awk "BEGIN {print $visited_counter-$non_200_counter; exit}")
-latency_time_average=$(awk "BEGIN {print $latency_time_total/$pages_evaluated; exit}")
-server_time_average=$(awk "BEGIN {print $server_time_total/$pages_evaluated; exit}")
 
 echo "Pages visited:                  $((visited_counter))"
 echo "Pages evaluated:                $((visited_counter - non_200_counter))"
 echo "Pages skipped:                  $non_200_counter"
 echo "Total time elapsed:             $time_total s"
-echo "Avg TTFB:                       $(awk "BEGIN {print ($time_total/$pages_evaluated) * 1000; exit}") ms"
-echo "Avg server time with latency:   $(awk "BEGIN {print $server_time_average * 1000; exit}") ms"
-echo "Avg network latency:            $(awk "BEGIN {print $latency_time_average * 1000; exit}") ms"
-echo "Avg server time minus latency:  $(awk "BEGIN {print ($server_time_average - $latency_time_average*2) * 1000; exit}") ms"
+
+if [[ $pages_evaluated -gt 0 ]]; then
+    latency_time_average=$(awk "BEGIN {print $latency_time_total/$pages_evaluated; exit}")
+    server_time_average=$(awk "BEGIN {print $server_time_total/$pages_evaluated; exit}")
+    
+    echo "Avg TTFB:                       $(awk "BEGIN {print ($time_total/$pages_evaluated) * 1000; exit}") ms"
+    echo "Avg server time with latency:   $(awk "BEGIN {print $server_time_average * 1000; exit}") ms"
+    echo "Avg network latency:            $(awk "BEGIN {print $latency_time_average * 1000; exit}") ms"
+    echo "Avg server time minus latency:  $(awk "BEGIN {print ($server_time_average - $latency_time_average*2) * 1000; exit}") ms"
+fi
