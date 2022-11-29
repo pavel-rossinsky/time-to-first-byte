@@ -6,14 +6,7 @@ An article to read explaining the concept is https://blog.cloudflare.com/a-quest
 
 #### Try it by running command in terminal
 ```
-curl -w \
-" time_namelookup: %{time_namelookup}\n \
-time_connect: %{time_connect}\n \
-time_appconnect: %{time_appconnect}\n \
-time_redirect: %{time_redirect}\n \
-time_pretransfer: %{time_pretransfer}\n \
-time_starttransfer: %{time_starttransfer}\n" \
--o /dev/null -s "https://www.google.com"
+curl -w "time_namelookup: %{time_namelookup}\ntime_connect: %{time_connect}\ntime_appconnect: %{time_appconnect}\ntime_redirect: %{time_redirect}\ntime_pretransfer: %{time_pretransfer}\ntime_starttransfer: %{time_starttransfer}\n" -o /dev/null -s "https://www.google.com"
 ```
 
 ## Sample output
