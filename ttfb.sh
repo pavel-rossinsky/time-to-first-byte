@@ -134,7 +134,7 @@ function evaluate_url() {
     fi
 }
 
-if [[ $random == 1 ]]; then
+if [[ $random -eq 1 ]]; then
     random_rows=()
 
     while IFS= read -r row ; do random_rows+=("$row"); done <<< "$(
@@ -172,7 +172,7 @@ printf "\n"
 
 pages_evaluated=$(awk "BEGIN {print $visited_counter-$non_200_counter; exit}")
 
-printf "Pages visited / evaluated / skipped:   %d / %d / %d\n\n" "$visited_counter" "$((visited_counter - non_200_counter))" "$non_200_counter"
+printf "Pages visited / evaluated / skipped:   %d / %d / %d\n\n" "$visited_counter" "$pages_evaluated" "$non_200_counter"
 printf "Total time elapsed:                  %.2f s\n" "$time_total"
 
 if [[ $pages_evaluated -gt 0 ]]; then
